@@ -19,7 +19,7 @@ class GameScreen:
         self.stats_font = pygame.font.SysFont('arial', 20)
         self.choice_font = pygame.font.SysFont('arial', 18)
         self.story_font = pygame.font.Font(None, 32)
-        self.choice_font = pygame.font.Font(None, 42, bold=True)
+        self.choice_font = pygame.font.Font(None, 42)
         self.desc_font = pygame.font.Font(None, 24)
         self.description_font = pygame.font.SysFont('arial', 16)
         
@@ -208,9 +208,9 @@ class GameScreen:
         card_width = (story_width - gap) // 2  # Ширина карточки
         card_height = 250  # Высота карточки
         
-        # Вычисляем начальную позицию (такую же как у истории)
+        # Вычисляем начальную позицию
         start_x = (self.screen.get_width() - story_width) // 2
-        start_y = 500  # Позиция сразу под историей
+        start_y = 600  # Увеличили отступ на 100 пикселей вниз
         
         current_scene = self.scenes[self.current_scene_id]
         choices = current_scene["choices"]
@@ -220,11 +220,16 @@ class GameScreen:
             card_x = start_x + i * (card_width + gap)
             card_y = start_y
             
-            # Рисуем карточку
-            rect = pygame.Rect(card_x, card_y, card_width, card_height)
-            pygame.draw.rect(self.screen, (50, 50, 50), rect)
+            # Создаем полупрозрачную карточку
+            card_surface = pygame.Surface((card_width, card_height))
+            card_surface.fill((50, 50, 50))
+            card_surface.set_alpha(200)  # Устанавливаем прозрачность как у истории
+            self.screen.blit(card_surface, (card_x, card_y))
             
-            # Разбиваем основной текст на строки
+            # Сохраняем область карточки
+            self.choice_rects[i] = pygame.Rect(card_x, card_y, card_width, card_height)
+            
+            # Отрисовываем основной текст (прижат к верху)
             words = choice["text"].split()
             lines = []
             current_line = []
@@ -239,22 +244,20 @@ class GameScreen:
             if current_line:
                 lines.append(" ".join(current_line))
             
-            # Отрисовываем основной текст (прижат к верху)
-            text_start_y = card_y + 20  # Отступ сверху
-            line_height = 30  # Увеличенный межстрочный интервал для жирного текста
+            text_start_y = card_y + 20
+            line_height = 30
             
             for j, line in enumerate(lines):
                 text_surface = self.choice_font.render(line, True, (255, 255, 255))
                 text_x = card_x + (card_width - text_surface.get_width()) // 2
                 self.screen.blit(text_surface, (text_x, text_start_y + j * line_height))
             
-            # Если есть описание
+            # Отрисовываем описание если есть
             if choice["description"]:
                 desc_words = choice["description"].split()
                 desc_lines = []
                 current_line = []
                 
-                # Разбиваем описание на строки
                 for word in desc_words:
                     current_line.append(word)
                     text = " ".join(current_line)
@@ -265,7 +268,6 @@ class GameScreen:
                 if current_line:
                     desc_lines.append(" ".join(current_line))
                 
-                # Отрисовываем описание (по центру карточки)
                 desc_line_height = 20
                 total_desc_height = len(desc_lines) * desc_line_height
                 desc_start_y = card_y + (card_height - total_desc_height) // 2
@@ -274,9 +276,6 @@ class GameScreen:
                     desc_surface = self.desc_font.render(line, True, (200, 200, 200))
                     desc_x = card_x + (card_width - desc_surface.get_width()) // 2
                     self.screen.blit(desc_surface, (desc_x, desc_start_y + j * desc_line_height))
-            
-            # Сохраняем область карточки
-            self.choice_rects[i] = rect
 
     def draw_stats(self):
         # Отрисовка здоровья
