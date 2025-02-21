@@ -160,7 +160,7 @@ class GameScreen:
     def draw_story_text(self):
         # Параметры текстового блока
         text_width = 960  # Ширина блока текста
-        text_height = 400  # Высота блока текста
+        text_height = 500  # Высота блока текста
         text_x = (self.screen.get_width() - text_width) // 2  # 480 пикселей от левого края
         text_y = 150  # Отступ сверху
         
@@ -210,7 +210,7 @@ class GameScreen:
         
         # Вычисляем начальную позицию
         start_x = (self.screen.get_width() - story_width) // 2
-        start_y = 600  # Увеличили отступ на 100 пикселей вниз
+        start_y = 700  # Увеличили отступ на 100 пикселей вниз
         
         current_scene = self.scenes[self.current_scene_id]
         choices = current_scene["choices"]
